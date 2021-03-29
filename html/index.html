@@ -1,0 +1,48 @@
+<html>
+
+<header>
+    <meta property="og:title" content="Shoot three bags." />
+    <meta property="og:description" content="Shoot three bags with baseballs." />
+    <meta property="og:image" content="https://raw.githack.com/danborutori/Softbody-Demo/master/html/preview.png" />
+	<meta property="twitter:card" content="summary" />	
+	<meta property="twitter:title" content="Shoot three bags." />
+    <meta property="twitter:description" content="Shoot three bags with baseballs." />
+    <meta property="twitter:image" content="https://raw.githack.com/danborutori/Softbody-Demo/master/html/preview.png" />
+
+    <title>Shoot three bags.</title>
+</header>
+
+<body>
+
+    <canvas id="mainCanvas" style="background-color: blue; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+
+</body>
+
+<script src="script/lib/three.min.js"></script>
+<script src="script/lib/BufferGeometryUtils.js"></script>
+<script src="script/lib/GLTFLoader.js"></script>
+<script src="script/lib/STLLoader.js"></script>
+<script src="script/lib/EffectComposer.js"></script>
+<script src="script/lib/ShaderPass.js"></script>
+<script src="script/lib/CopyShader.js"></script>
+<script src="script/lib/RenderPass.js"></script>
+<script src="script/lib/SMAAShader.js"></script>
+<script src="script/lib/SMAAPass.js"></script>
+<script src="script/lib/BokehShader.js"></script>
+<script src="script/lib/BokehPass.js"></script>
+<script src="script/lib/LuminosityHighPassShader.js"></script>
+<script src="script/lib/UnrealBloomPass.js"></script>
+<script src="script/lib/ConvexHull.js"></script>
+<script src="script/lib/ammo.wasm.js"></script>
+<script>
+    Ammo().then(()=>{
+        const scriptNode = document.createElement("script")
+        scriptNode.src = "script/all.min.js"
+        scriptNode.onload = ()=>{
+            new hahaApp.App(mainCanvas).init().start()
+        }
+        document.body.append(scriptNode)
+    })
+</script>
+
+</html>

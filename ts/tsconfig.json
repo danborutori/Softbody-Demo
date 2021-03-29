@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "amd",
+        "jsx": "react",
+        "accessorOptimization": true,
+        "reorderFiles": true,
+        "outFile": "../build/all.js",
+        "typeRoots": [
+            "../bower_components/"
+        ]
+    },  
+    "includes": [
+        "src/**/*",
+        "../bower_components/**/*.d.ts"
+    ]
+}

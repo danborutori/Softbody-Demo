@@ -1,0 +1,21 @@
+{
+  "name": "haha",
+  "authors": [
+    "lun lam <lun.yl.lam@gtomato.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "three.js": "https://github.com/mrdoob/three.js.git#r125",
+    "ammo.js": "https://github.com/kripken/ammo.js.git#master",
+    "ammo.js-typings": "https://github.com/osman-turan/ammo.js-typings.git"
+  }
+}

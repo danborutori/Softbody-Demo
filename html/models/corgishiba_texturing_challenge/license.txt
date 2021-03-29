@@ -1,0 +1,11 @@
+Model Information:
+* title:	Corgi/Shiba texturing challenge
+* source:	https://sketchfab.com/3d-models/corgishiba-texturing-challenge-64aa945a02a0443db10bde5cc1be664b
+* author:	skibigfx (https://sketchfab.com/skibigfx)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Corgi/Shiba texturing challenge" (https://sketchfab.com/3d-models/corgishiba-texturing-challenge-64aa945a02a0443db10bde5cc1be664b) by skibigfx (https://sketchfab.com/skibigfx) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
