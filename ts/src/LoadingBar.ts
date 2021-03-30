@@ -14,6 +14,7 @@ namespace hahaApp {
             htmlElement.style.fontFamily = "Arial, Helvetica, sans-serif"
             htmlElement.style.borderRadius = "4px"
             htmlElement.style.visibility = "hidden"
+            htmlElement.style.userSelect = "none"
             htmlElement.innerHTML = "Loading..."
             this.htmlElement = htmlElement
         }

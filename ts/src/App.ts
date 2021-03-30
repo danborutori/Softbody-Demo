@@ -144,6 +144,7 @@ namespace hahaApp {
 
             document.body.appendChild( this.hud.domElement )
             document.body.appendChild( this.loadingBar.htmlElement )
+            document.body.appendChild( new InfoPanel().htmlElement )
 
             //this.setupPassControl()
         }
