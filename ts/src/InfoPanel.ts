@@ -23,15 +23,15 @@ namespace hahaApp {
             <table>
             <tr>
             <td><b>Version:</b></td>
-            <td>1.0.0</td>
+            <td>${config.version}</td>
             </tr>
             <tr>
             <td><b>Author:</b></td>
-            <td>ANMCダンボールとり</td>
+            <td>${config.author}}</td>
             </tr>
             <tr>
             <td><b>Source Code:</b></td>
-            <td><a name="link">https://github.com/danborutori/Softbody-Demo</a></td>
+            <td><a name="link">${config.projectUrl}</a></td>
             </tr>
             </table>
             </div>
