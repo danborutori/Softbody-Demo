@@ -12,22 +12,6 @@ namespace hahaApp {
     const ballLocalInteria = new Ammo.btVector3
     ballShape.calculateLocalInertia(ballMass, ballLocalInteria)
 
-    new (THREE as any).GLTFLoader().load("./models/worn_baseball_ball/scene.gltf", gltf =>{
-        const scene = gltf.scene as THREE.Scene
-        setAnisotropic(scene)
-        const mesh = scene.getObjectByName("polySurface5_lambert1_0") as THREE.Mesh        
-        const ballMat = mesh.material as THREE.Material
-        const ballGeo = mesh.geometry as THREE.BufferGeometry
-        ballGeo.computeBoundingSphere()
-        v.copy(ballGeo.boundingSphere.center).negate()
-        const s = ballRadius/ballGeo.boundingSphere.radius
-        ballGeo.translate(v.x, v.y, v.z).scale(s,s,s)
-        ballData = {
-            material: ballMat,
-            geometry: ballGeo
-        }
-    })
-
     const m = new THREE.Matrix4
     const m2 = new THREE.Matrix4
     const v = new THREE.Vector3
@@ -35,6 +19,26 @@ namespace hahaApp {
     const btV = new Ammo.btVector3
 
     export class Player {
+        static async init(){
+            return new Promise<void>( (resolve, reject)=>{
+                new (THREE as any).GLTFLoader().load("./models/worn_baseball_ball/scene.gltf", gltf =>{
+                    const scene = gltf.scene as THREE.Scene
+                    setAnisotropic(scene)
+                    const mesh = scene.getObjectByName("polySurface5_lambert1_0") as THREE.Mesh        
+                    const ballMat = mesh.material as THREE.Material
+                    const ballGeo = mesh.geometry as THREE.BufferGeometry
+                    ballGeo.computeBoundingSphere()
+                    v.copy(ballGeo.boundingSphere.center).negate()
+                    const s = ballRadius/ballGeo.boundingSphere.radius
+                    ballGeo.translate(v.x, v.y, v.z).scale(s,s,s)
+                    ballData = {
+                        material: ballMat,
+                        geometry: ballGeo
+                    }
+                    resolve()
+                }, undefined, reject)
+            })
+        }
 
         readonly object3D = new THREE.Object3D()
         private fireBallCooldown = 0

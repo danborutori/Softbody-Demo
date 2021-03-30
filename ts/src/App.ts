@@ -56,6 +56,7 @@ namespace hahaApp {
 
     export class App {
         hud = new HUD()
+        loadingBar = new LoadingBar()
 
         readonly renderer: THREE.WebGLRenderer
         readonly effectComposer: EffectComposer
@@ -142,13 +143,18 @@ namespace hahaApp {
             })
 
             document.body.appendChild( this.hud.domElement )
+            document.body.appendChild( this.loadingBar.htmlElement )
+            document.body.appendChild( new InfoPanel().htmlElement )
 
             //this.setupPassControl()
         }
     
         init(){
-            this.setupAmmo()
+            this.setupAmmo(),
             this.setupScene()
+
+            const loading = this.loadingBar.startLoading()
+            Player.init().then(()=>loading.end())
 
             window.addEventListener("resize", ()=>{
                 this.onResize()
@@ -191,11 +197,14 @@ namespace hahaApp {
             const floorSize = 10
 
             const textureLoader = new THREE.TextureLoader()
+            const loading = this.loadingBar.startLoading()
             Promise.all([
                 new Promise<THREE.Texture>((resolve, reject)=>textureLoader.load("./textures/dirty_concrete_1k_jpg/dirty_concrete_diff_1k.jpg", tex=>resolve(tex), undefined, ev=>reject(ev))),
                 new Promise<THREE.Texture>((resolve, reject)=>textureLoader.load("./textures/dirty_concrete_1k_jpg/dirty_concrete_nor_1k.jpg", tex=>resolve(tex), undefined, ev=>reject(ev))),
                 new Promise<THREE.Texture>((resolve, reject)=>textureLoader.load("./textures/dirty_concrete_1k_jpg/dirty_concrete_rough_1k.jpg", tex=>resolve(tex), undefined, ev=>reject(ev)))
             ]).then(results=>{
+                loading.end()
+
                 const diff = results[0]
                 const nor = results[1]
                 const roughness = results[2]
@@ -318,7 +327,10 @@ namespace hahaApp {
             //     this.setupSoftBody( geometry, new THREE.MeshStandardMaterial(), new THREE.Vector3(0,3,0))
 
             // })
+            const loading2 = this.loadingBar.startLoading()
             new (THREE as any).GLTFLoader().load("./models/corgishiba_texturing_challenge/scene.gltf", gltf =>{
+                loading2.end()
+
                 const scene = gltf.scene as THREE.Scene
                 setAnisotropic(scene)
 
@@ -387,7 +399,10 @@ namespace hahaApp {
                 new THREE.Vector3(2,0,4),
             ]
 
+            const loading = this.loadingBar.startLoading()
             new (THREE as any).GLTFLoader().load("./models/bottle_old_wine/scene.gltf", gltf =>{
+                loading.end()
+
                 const scene = gltf.scene as THREE.Scene
                 setAnisotropic(scene)
                 const mesh = scene.getObjectByName("bottle_05L_1_03_-_Default_0") as THREE.Mesh
@@ -473,7 +488,10 @@ namespace hahaApp {
 
         private addHangingBall(){
 
+            const loading = this.loadingBar.startLoading()
             new (THREE as any).GLTFLoader().load("./models/wood_stick_04/scene.gltf", gltf =>{
+                loading.end()
+
                 const scene = gltf.scene as THREE.Scene
                 setAnisotropic(scene)
                 const mesh = scene.getObjectByName("wood_stick_04_wood_stick_04_0") as THREE.Mesh
@@ -506,17 +524,23 @@ namespace hahaApp {
                     metalness: 0
                 })
 
+                const loading2 = this.loadingBar.startLoading()
+                const loading3 = this.loadingBar.startLoading()
+                const loading4 = this.loadingBar.startLoading()
                 const loader = new THREE.TextureLoader()
                 loader.load("./textures/fabric_leather_01_1k_jpg/fabric_leather_01_diff_1k.jpg", tex=>{
+                    loading2.end()
                     ballMat.map = tex
                     ballMat.needsUpdate = true
                 })
                 loader.load("./textures/fabric_leather_01_1k_jpg/fabric_leather_01_nor_1k.jpg", tex=>{
+                    loading3.end()
                     ballMat.normalMap = tex
                     ballMat.normalMapType = THREE.TangentSpaceNormalMap
                     ballMat.needsUpdate = true
                 })
                 loader.load("./textures/fabric_leather_01_1k_jpg/fabric_leather_01_rough_1k.jpg", tex=>{
+                    loading4.end()
                     ballMat.roughnessMap = tex
                     ballMat.needsUpdate = true
                 })
@@ -562,8 +586,9 @@ namespace hahaApp {
                     ))
             }
     
-
+            const loading = this.loadingBar.startLoading()
             new (THREE as any).GLTFLoader().load("./models/clover_grass/scene.gltf", gltf=>{
+                loading.end()
                 const scene = gltf.scene as THREE.Scene
 
                 scene.traverse( (mesh: THREE.Mesh)=>{
