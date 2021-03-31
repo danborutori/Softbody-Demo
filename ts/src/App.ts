@@ -610,7 +610,8 @@ namespace hahaApp {
                         const instancedMesh = new THREE.InstancedMesh(mesh.geometry, mat, instancePosition.length)
                         instancedMesh.customDepthMaterial = instancedMesh.customDistanceMaterial = GrassWinding.modify( new THREE.MeshDepthMaterial({
                             map: (mesh.material as THREE.MeshStandardMaterial).map,
-                            alphaTest: (mesh.material as THREE.MeshStandardMaterial).alphaTest
+                            alphaTest: (mesh.material as THREE.MeshStandardMaterial).alphaTest,
+                            depthPacking: THREE.RGBADepthPacking
                         }))
                         instancedMesh.castShadow = true
                         instancedMesh.receiveShadow = true
