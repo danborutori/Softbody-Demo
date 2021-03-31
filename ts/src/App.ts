@@ -22,11 +22,17 @@ namespace hahaApp {
         }
     }
 
-    declare class Pass {
+    export declare class Pass {
         enabled: boolean
+        needsSwap: boolean
+        renderToScreen: boolean
     }
 
     declare class EffectComposer {
+        renderTarget1: THREE.WebGLRenderTarget
+        renderTarget2: THREE.WebGLRenderTarget
+        writeBuffer: THREE.WebGLRenderTarget
+        readBuffer: THREE.WebGLRenderTarget
         passes: Pass[]
 
         render( deltaTime: number )
@@ -84,9 +90,7 @@ namespace hahaApp {
             let rect = canvas.getBoundingClientRect()
             canvas.width = rect.width
             canvas.height = rect.height
-            const ctx = canvas.getContext("webgl2", {
-                depth: true
-            })
+            const ctx = canvas.getContext("webgl2", {})
 
             this.renderer = new THREE.WebGLRenderer({
                 context: ctx
@@ -98,20 +102,9 @@ namespace hahaApp {
             this.renderer.setSize(rect.width, rect.height)
             this.renderer.setClearColor("#0000ff")
 
-            this.effectComposer = new (THREE as any).EffectComposer(
-                this.renderer,
-                new THREE.WebGLRenderTarget(
-                    rect.width,
-                    rect.height,
-                    {
-                        format: THREE.RGBAFormat,
-                        type: THREE.UnsignedByteType,
-                        depthBuffer: true,
-                        depthTexture: new THREE.DepthTexture( rect.width, rect.height ),
-                        generateMipmaps: false
-                    }
-                )
-            )
+            this.effectComposer = new (THREE as any).EffectComposer( this.renderer )
+            this.effectComposer.renderTarget1.depthTexture = new THREE.DepthTexture( rect.width, rect.height )
+            this.effectComposer.renderTarget2.depthTexture = new THREE.DepthTexture( rect.width, rect.height )
 
             this.scene = new THREE.Scene()
             this.camera = new THREE.PerspectiveCamera(50,rect.width/rect.height)
@@ -119,12 +112,11 @@ namespace hahaApp {
             const renderPass = new (THREE as any).RenderPass( this.scene, this.camera )
             this.effectComposer.addPass(renderPass)
 
+            const bokenPass = new DofPass(this.camera, {focus: 2.5, maxblur: 0.005, aperture: 3})
+            this.effectComposer.addPass(bokenPass)
+
             const smaaPass = new (THREE as any).SMAAPass( rect.width, rect.height )
             this.effectComposer.addPass(smaaPass)
-
-            const bokenPass = new (THREE as any).BokehPass( this.scene, this.camera, {focus: 5, maxblur: 0.01, aperture: 0.00005})
-            bokenPass.needsSwap = true
-            this.effectComposer.addPass(bokenPass)
 
             const bloomPass = new (THREE as any).UnrealBloomPass(new THREE.Vector2( rect.width, rect.height ), 0.2)
             this.effectComposer.addPass(bloomPass)

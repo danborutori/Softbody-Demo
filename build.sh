@@ -19,7 +19,6 @@ cp bower_components/three.js/examples/js/postprocessing/RenderPass.js ./html/scr
 cp bower_components/three.js/examples/js/shaders/SMAAShader.js ./html/script/lib/
 cp bower_components/three.js/examples/js/postprocessing/SMAAPass.js ./html/script/lib/
 cp bower_components/three.js/examples/js/shaders/BokehShader.js ./html/script/lib/
-cp bower_components/three.js/examples/js/postprocessing/BokehPass.js ./html/script/lib/
 cp bower_components/three.js/examples/js/shaders/LuminosityHighPassShader.js ./html/script/lib/
 cp bower_components/three.js/examples/js/postprocessing/UnrealBloomPass.js ./html/script/lib/
 cp bower_components/three.js/examples/js/math/ConvexHull.js ./html/script/lib/
