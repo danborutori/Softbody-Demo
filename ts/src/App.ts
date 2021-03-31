@@ -98,7 +98,20 @@ namespace hahaApp {
             this.renderer.setSize(rect.width, rect.height)
             this.renderer.setClearColor("#0000ff")
 
-            this.effectComposer = new (THREE as any).EffectComposer( this.renderer )
+            this.effectComposer = new (THREE as any).EffectComposer(
+                this.renderer,
+                new THREE.WebGLRenderTarget(
+                    rect.width,
+                    rect.height,
+                    {
+                        format: THREE.RGBAFormat,
+                        type: THREE.UnsignedByteType,
+                        depthBuffer: true,
+                        depthTexture: new THREE.DepthTexture( rect.width, rect.height ),
+                        generateMipmaps: false
+                    }
+                )
+            )
 
             this.scene = new THREE.Scene()
             this.camera = new THREE.PerspectiveCamera(50,rect.width/rect.height)
