@@ -3,7 +3,7 @@
 You can shoot three hanging balls with a lot of baseball.
 
 A live demo can be find here.
-http://rawcdn.githack.com/danborutori/Softbody-Demo/master/html/index.html
+http://rawcdn.githack.com/danborutori/Softbody-Demo/1.0.4/html/index.html
 
 ## Getting Started
 
