@@ -479,12 +479,21 @@ namespace hahaApp {
             
         }
 
-        private setupSoftBody( geometry: THREE.BufferGeometry, material: THREE.Material, position: THREE.Vector3 ){
-            const softBody = new SoftBody(this.world.getWorldInfo(), geometry.clone().translate(position.x, position.y, position.z))
-            const mesh = new THREE.Mesh(softBody.geometry, material)
-            mesh.receiveShadow = true
-            mesh.castShadow = true
-            this.scene.add(mesh)
+        private setupSoftBody(
+            geometry: THREE.BufferGeometry,
+            material: THREE.Material, 
+            position: THREE.Vector3, 
+            clz: {
+                new(
+                    worldInfo: Ammo.btSoftBodyWorldInfo,
+                    geometry: THREE.BufferGeometry,
+                    material: THREE.Material ): SoftBody
+                } = SoftBody
+            ){
+            const softBody = new clz(this.world.getWorldInfo(), geometry.clone().translate(position.x, position.y, position.z), material)
+            softBody.mesh.receiveShadow = true
+            softBody.mesh.castShadow = true
+            this.scene.add(softBody.mesh)
 
             this.world.addSoftBody(softBody.softbody, 1, -1)
             this.softBodies.push(softBody)
@@ -553,7 +562,7 @@ namespace hahaApp {
 
                 for( let i=0; i<3; i++ ){
                     const ballGeometry = new THREE.SphereBufferGeometry(0.5,16,16)
-                    const sb = this.setupSoftBody(ballGeometry, ballMat, new THREE.Vector3(i-1,1.5))
+                    const sb = this.setupSoftBody(ballGeometry, ballMat, new THREE.Vector3(i-1,1.5), HangingBall)
                     sb.softbody.getCollisionShape().setMargin(0.1)
                     sb.softbody.setUserIndex(AudioIndex.punch)
 

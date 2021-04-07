@@ -42,6 +42,7 @@ namespace hahaApp {
 
     export class SoftBody {
 
+        readonly mesh: THREE.Mesh
         readonly softbody: Ammo.btSoftBody
         readonly geometry: THREE.BufferGeometry
         private mapping: number[]
@@ -49,7 +50,8 @@ namespace hahaApp {
 
         constructor(
             worldInfo: Ammo.btSoftBodyWorldInfo,
-            geometry: THREE.BufferGeometry
+            geometry: THREE.BufferGeometry,
+            material: THREE.Material
         ){
             this.geometry = geometry
             const info = processGeometry(geometry)
@@ -72,6 +74,17 @@ namespace hahaApp {
             this.mapping = info.mapping
 
             Ammo.destroy(helper)
+
+            this.mesh = new THREE.Mesh(geometry, material)            
+        }
+
+        protected onDeform( app: App, deform: number ){
+            if( deform > 0.2 ){
+                if( this.soundCooldown<=0 ){
+                    app.audio.playSoundByIndex(this.softbody.getUserIndex())
+                    this.soundCooldown = 0.5
+                }
+            }
         }
 
         update(app: App, deltaTime: number){
@@ -98,12 +111,7 @@ namespace hahaApp {
             position.needsUpdate = true
             normal.needsUpdate = true
 
-            if( deform > 0.2 ){
-                if( this.soundCooldown<=0 ){
-                    app.audio.playSoundByIndex(this.softbody.getUserIndex())
-                    this.soundCooldown = 0.5
-                }
-            }
+            this.onDeform(app, deform)
         }
 
     }
