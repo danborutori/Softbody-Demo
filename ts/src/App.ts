@@ -112,7 +112,8 @@ namespace hahaApp {
             const renderPass = new (THREE as any).RenderPass( this.scene, this.camera )
             this.effectComposer.addPass(renderPass)
 
-            const bokenPass = new DofPass(this.camera, {focus: 2.5, maxblur: 0.005, aperture: 3})
+            const maxblur = 0.005
+            const bokenPass = new DofPass(this.camera, {focus: 5, maxblur: maxblur, aperture: maxblur/2})
             this.effectComposer.addPass(bokenPass)
 
             const smaaPass = new (THREE as any).SMAAPass( rect.width, rect.height )
