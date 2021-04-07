@@ -15,6 +15,7 @@
 <body>
 
     <canvas id="mainCanvas" style="background-color: blue; position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></canvas>
+    <div id="initializing_label" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background-color: white; border-radius: 4px; padding: 8px;">Initializing</div>
 
 </body>
 
@@ -35,6 +36,7 @@
 <script src="script/lib/ammo.wasm.js"></script>
 <script>
     Ammo().then(()=>{
+        initializing_label.style.visibility = "hidden"
         const scriptNode = document.createElement("script")
         scriptNode.src = "script/all.min.js"
         scriptNode.onload = ()=>{
