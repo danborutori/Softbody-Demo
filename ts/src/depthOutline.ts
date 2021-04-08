@@ -22,8 +22,15 @@ namespace hahaApp {
             depthBuffer: false,
             stencilBuffer: false
         })
+        private normalRenderTarget = new THREE.WebGLRenderTarget(1024,1024,{
+            format: THREE.RGBAFormat,
+            type: THREE.UnsignedByteType,
+            generateMipmaps: false,
+            depthBuffer: false,
+            stencilBuffer: false
+        })
 
-        private fsQuad = new (THREE as any).Pass.FullScreenQuad( new THREE.ShaderMaterial({
+        private copyDepthMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 tDiffuse: {
                     value: null
@@ -48,7 +55,48 @@ namespace hahaApp {
 
                 }
             `
-        }))
+        })
+        private depthToNormalMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                tDepth: { value: null },
+                resolution: { value: new THREE.Vector2},
+                projectMatrixInv: { value: new THREE.Matrix4}
+            },
+            vertexShader: `
+                void main(){
+                    gl_Position = vec4(position, 1);
+                }
+            `,
+            fragmentShader: `
+                #include <packing>
+
+                uniform sampler2D tDepth;                
+                uniform vec2 resolution;
+                uniform mat4 projectMatrixInv;
+
+                void main(){
+                    vec2 uv = gl_FragCoord.xy/resolution;
+                    vec2 uvx = (gl_FragCoord.xy+vec2(1,0))/resolution;
+                    vec2 uvy = (gl_FragCoord.xy+vec2(0,1))/resolution;
+                    float depth = texture2D( tDepth, uv ).r;
+                    float depthx = texture2D( tDepth, uvx ).r;
+                    float depthy = texture2D( tDepth, uvy ).r;
+
+                    vec4 pt =  projectMatrixInv*(vec4( uv, depth, 1 )*2.0-1.0);
+                    vec4 ptx =  projectMatrixInv*(vec4( uvx, depthx, 1 )*2.0-1.0);
+                    vec4 pty =  projectMatrixInv*(vec4( uvy, depthy, 1 )*2.0-1.0);
+
+                    pt /= pt.w;
+                    ptx /= ptx.w;
+                    pty /= pty.w;
+
+                    vec3 normal = normalize( cross( ptx.xyz-pt.xyz, pty.xyz-pt.xyz ) ) * 0.5+0.5;
+
+                    gl_FragColor = vec4(normal, 1);                    
+                }
+            `
+        })
+        private fsQuad = new (THREE as any).Pass.FullScreenQuad()
 
         constructor(){
             super(
@@ -59,6 +107,9 @@ namespace hahaApp {
                     },
                     uniforms: {
                         tDepth: {
+                            value: null
+                        },
+                        tNormal: {
                             value: null
                         },
                         clipNear: {
@@ -86,6 +137,7 @@ namespace hahaApp {
                         #include <packing>
 
                         uniform sampler2D tDepth;
+                        uniform sampler2D tNormal;
                         uniform float clipNear;
                         uniform float clipFar;
                         uniform float aspectRatio;
@@ -95,17 +147,24 @@ namespace hahaApp {
 
                         void main(){
                             float depth = texture2D(tDepth, vUv).r;
+                            vec3 normal = texture2D(tNormal, vUv).xyz*2.0-1.0;
                             float viewZ = perspectiveDepthToViewZ(depth, clipNear, clipFar);
                             float depthDiff = 0.0;
+                            vec3 normalDiff = vec3(0,0,0);
 
                             for( int i=0; i<SAMPLE_OFFSET_LEN; i++){
-                                float d = texture2D(tDepth, vUv+sampleOffsets[i]*vec2(aspectRatio, 1.0)).r;
+                                vec2 uv = vUv+sampleOffsets[i]*vec2(aspectRatio, 1.0);
+                                float d = texture2D(tDepth, uv).r;
+                                vec3 n = texture2D(tNormal, uv).xyz*2.0-1.0;
                                 float vz = perspectiveDepthToViewZ(d, clipNear, clipFar);
                                 depthDiff += abs( viewZ-vz );
+                                normalDiff += abs( normal-n );
                             }
                             depthDiff /= float(SAMPLE_OFFSET_LEN);
+                            normalDiff /= float(SAMPLE_OFFSET_LEN);
 
                             float opacity = clamp((depthDiff-0.1)/0.01, 0.0, 1.0);
+                            opacity += clamp((length(normalDiff)-0.4)/0.4, 0.0, 1.0);
                             vec3 lineColor = vec3(0,0,0);
                             gl_FragColor = vec4(lineColor, opacity);
                         }
@@ -120,18 +179,29 @@ namespace hahaApp {
             this.renderOrder = 1
             this.frustumCulled = false
             ;(this.material as THREE.ShaderMaterial).uniforms.tDepth.value = this.depthRenderTarget.texture
+            ;(this.material as THREE.ShaderMaterial).uniforms.tNormal.value = this.normalRenderTarget.texture
 
             this.onBeforeRender = (renderer, scene, camera)=>{
                 renderer.getDrawingBufferSize(v2)
-                if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y )
+                if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y ){
                     this.depthRenderTarget.setSize(v2.x, v2.y)
+                    this.normalRenderTarget.setSize(v2.x, v2.y)
+                }
 
                 const restore = {
                     renderTarget: renderer.getRenderTarget()  as THREE.WebGLRenderTarget
                 }
 
-                this.fsQuad.material.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
+                this.copyDepthMaterial.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
+                this.fsQuad.material = this.copyDepthMaterial
                 renderer.setRenderTarget( this.depthRenderTarget )
+                this.fsQuad.render( renderer )
+
+                this.depthToNormalMaterial.uniforms.tDepth.value = restore.renderTarget.depthTexture
+                this.depthToNormalMaterial.uniforms.resolution.value.copy(v2)
+                this.depthToNormalMaterial.uniforms.projectMatrixInv.value.copy((camera as THREE.PerspectiveCamera).projectionMatrixInverse)
+                this.fsQuad.material = this.depthToNormalMaterial
+                renderer.setRenderTarget( this.normalRenderTarget )
                 this.fsQuad.render( renderer )
 
                 ;(this.material as THREE.ShaderMaterial).uniforms.clipNear.value = (camera as THREE.PerspectiveCamera).near
