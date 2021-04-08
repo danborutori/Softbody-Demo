@@ -5,6 +5,7 @@ namespace hahaApp {
         static readonly bottlelHit = 2
         static readonly punch = 3
         static readonly ar = 4
+        static readonly star = 5
     }
 
     export class AudioManager{
@@ -29,7 +30,8 @@ namespace hahaApp {
                 baseballHit: "./sound/516974__plucinskicasey__normalpunch.wav",
                 bottlelHit: "./sound/178660__hanbaal__bottle-tink2.wav",
                 punch: "./sound/81042__rock-savage__blood-hitting-window.wav",
-                ar: "./sound/ar.mp3"
+                ar: "./sound/ar.mp3",
+                star: "./sound/522159__magnuswaker__gutsy-spillage-1.wav"
             }
             for( let name in samples ){
                 const n = name
@@ -59,6 +61,9 @@ namespace hahaApp {
                     break
                 case AudioIndex.ar:
                     this.playSound("ar")
+                    break
+                case AudioIndex.star:
+                    this.playSound("star")
                     break
             }
         }

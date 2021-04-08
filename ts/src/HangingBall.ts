@@ -40,6 +40,7 @@ namespace hahaApp {
 
             this.softbody.m_cfg.kPR = 0
 
+            app.audio.playSound("star")
             Stars.explodStar( app, position.clone() )
         }
     }
