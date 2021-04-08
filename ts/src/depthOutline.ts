@@ -164,7 +164,7 @@ namespace hahaApp {
                             normalDiff /= float(SAMPLE_OFFSET_LEN);
 
                             float opacity = clamp((depthDiff-0.1)/0.01, 0.0, 1.0);
-                            opacity += clamp((length(normalDiff)-0.4)/0.4, 0.0, 1.0);
+                            opacity += clamp((length(normalDiff)-0.5)/0.25, 0.0, 1.0);
                             vec3 lineColor = vec3(0,0,0);
                             gl_FragColor = vec4(lineColor, opacity);
                         }
