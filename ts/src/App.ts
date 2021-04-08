@@ -110,6 +110,8 @@ namespace hahaApp {
             this.scene = new THREE.Scene()
             this.camera = new THREE.PerspectiveCamera(50,rect.width/rect.height)
 
+            this.scene.add( new OutlinePlane() )
+
             const renderPass = new (THREE as any).RenderPass( this.scene, this.camera )
             this.effectComposer.addPass(renderPass)
 
