@@ -22,22 +22,25 @@ namespace hahaApp {
 
         }
 
-        protected onDeform( app: App, deform: number ){
+        protected onDeform( app: App, deform: number, position: THREE.Vector3 ){
             if( this.hp>0 )
-                super.onDeform(app,deform)
+                super.onDeform(app,deform, position)
 
             if( deform>0.2 ){
-                this.hp -= deform
-                if( this.hp<=0 ){
-                    this.onDie()
+                if( this.hp>0 ){
+                    this.hp -= deform
+                    if( this.hp<=0 ){
+                        this.onDie( app, position )
+                    }
                 }
             }
         }
 
-        private onDie(){
+        private onDie( app: App, position: THREE.Vector3 ){
 
             this.softbody.m_cfg.kPR = 0
 
+            Stars.explodStar( app, position )
         }
     }
 }

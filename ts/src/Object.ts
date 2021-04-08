@@ -11,7 +11,7 @@ namespace hahaApp {
 
     export class Object {
 
-        private motionState: Ammo.btDefaultMotionState
+        protected motionState: Ammo.btDefaultMotionState
         readonly rigidBody: Ammo.btRigidBody        
 
         constructor(

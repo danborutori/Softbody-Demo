@@ -1,6 +1,7 @@
 namespace hahaApp {
     const epsilon = 0.0001
     const v = new THREE.Vector3
+    const v3 = new THREE.Vector3
 
     function toKey( v: THREE.Vector3 ) {
         return `${Math.round(v.x/epsilon)},${Math.round(v.y/epsilon)},${Math.round(v.z/epsilon)}`
@@ -78,7 +79,7 @@ namespace hahaApp {
             this.mesh = new THREE.Mesh(geometry, material)            
         }
 
-        protected onDeform( app: App, deform: number ){
+        protected onDeform( app: App, deform: number, position: THREE.Vector3 ){
             if( deform > 0.2 ){
                 if( this.soundCooldown<=0 ){
                     app.audio.playSoundByIndex(this.softbody.getUserIndex())
@@ -96,6 +97,8 @@ namespace hahaApp {
             const v = new THREE.Vector3
             const v2 = new THREE.Vector3
             let deform = 0
+            let totalDeform = 0
+            v3.set(0,0,0)
             for( let i=0; i<n; i++ ){
                 const n = this.softbody.m_nodes.at(this.mapping[i])
                 const m_x = n.m_x
@@ -103,15 +106,19 @@ namespace hahaApp {
 
                 v.fromBufferAttribute(position, i)
                 v2.set(m_x.x(), m_x.y(), m_x.z())
-                deform = Math.max(deform,v.distanceTo(v2))
+                const d = v.distanceTo(v2)
+                deform = Math.max(deform,d)
+                totalDeform += d
+                v3.add(v2.multiplyScalar(d))
 
                 position.setXYZ(i, m_x.x(), m_x.y(), m_x.z())
                 normal.setXYZ(i, m_n.x(), m_n.y(), m_n.z())
             }
+            v3.divideScalar(totalDeform)
             position.needsUpdate = true
             normal.needsUpdate = true
 
-            this.onDeform(app, deform)
+            this.onDeform(app, deform, v3)
         }
 
     }
