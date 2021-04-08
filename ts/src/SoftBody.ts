@@ -109,9 +109,9 @@ namespace hahaApp {
                 const d = v.distanceTo(v2)
                 deform = Math.max(deform,d)
                 totalDeform += d
-                v3.add(v2.multiplyScalar(d))
+                v3.addScaledVector(v2, d)
 
-                position.setXYZ(i, m_x.x(), m_x.y(), m_x.z())
+                v2.toArray(position.array, i*3)
                 normal.setXYZ(i, m_n.x(), m_n.y(), m_n.z())
             }
             v3.divideScalar(totalDeform)

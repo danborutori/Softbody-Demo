@@ -40,7 +40,7 @@ namespace hahaApp {
 
             this.softbody.m_cfg.kPR = 0
 
-            Stars.explodStar( app, position )
+            Stars.explodStar( app, position.clone() )
         }
     }
 }
