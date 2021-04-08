@@ -1,5 +1,5 @@
 namespace hahaApp {
-    const numParticle = 5
+    const numParticle = 6
     const m = new THREE.Matrix4
     const m2 = new THREE.Matrix4
     const q = new THREE.Quaternion
@@ -21,7 +21,7 @@ namespace hahaApp {
             g.computeBoundingBox()
             const center = g.boundingBox.getCenter(new THREE.Vector3())
             const size = g.boundingBox.getSize(new THREE.Vector3)
-            const s = 0.5/Math.max(size.x, size.y, size.z)
+            const s = 0.8/Math.max(size.x, size.y, size.z)
             g.translate(-center.x, -center.y, -center.z).scale(s,s,s)
             g.computeBoundingBox()
 
