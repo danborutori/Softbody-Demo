@@ -21,8 +21,8 @@ namespace hahaApp {
             g.computeBoundingBox()
             const center = g.boundingBox.getCenter(new THREE.Vector3())
             const size = g.boundingBox.getSize(new THREE.Vector3)
-            const s = 0.8/Math.max(size.x, size.y, size.z)
-            g.translate(-center.x, -center.y, -center.z).scale(s,s,s)
+            const s = new THREE.Vector3(.8,.8,.4).divide(size)
+            g.translate(-center.x, -center.y, -center.z).scale(s.x,s.y,s.z)
             g.computeBoundingBox()
 
 
