@@ -68,6 +68,9 @@ namespace hahaApp {
         readonly effectComposer: EffectComposer
         readonly scene: THREE.Scene
         readonly camera: THREE.PerspectiveCamera
+        readonly envCamera: THREE.CubeCamera
+        private dummyEnvMap = new THREE.CubeTexture()
+        private updateEnvMapCooldown = 0
         private light: THREE.Light
 
         world: Ammo.btSoftRigidDynamicsWorld
@@ -109,6 +112,18 @@ namespace hahaApp {
 
             this.scene = new THREE.Scene()
             this.camera = new THREE.PerspectiveCamera(50,rect.width/rect.height)
+            this.envCamera = new THREE.CubeCamera(0.1,10, new THREE.WebGLCubeRenderTarget(256,{
+                format: THREE.RGBAFormat,
+                type: THREE.UnsignedByteType,
+                depthBuffer: true,
+                generateMipmaps: false,
+                minFilter: THREE.LinearFilter,
+                magFilter: THREE.LinearFilter,
+                anisotropy: 16
+            }))
+            this.envCamera.position.set(0,5,0)
+            this.scene.environment = this.envCamera.renderTarget.texture
+            this.scene.add(this.envCamera)
 
             this.scene.add( new OutlinePlane() )
 
@@ -705,6 +720,14 @@ namespace hahaApp {
         }
 
         private render(){
+            if( this.updateEnvMapCooldown<=0 ){
+                this.scene.environment = this.dummyEnvMap
+                this.envCamera.update(this.renderer, this.scene)
+                this.scene.environment = this.envCamera.renderTarget.texture
+                this.updateEnvMapCooldown = 4
+            }else{
+                this.updateEnvMapCooldown--
+            }
             this.effectComposer.render(1.0/60)
         }
 
