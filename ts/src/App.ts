@@ -540,8 +540,9 @@ namespace hahaApp {
 
                 this.objects.push(barObj)
 
-                const ballMat = new THREE.MeshStandardMaterial({
-                    metalness: 0
+                const ballMat = new THREE.MeshPhysicalMaterial({
+                    metalness: 0,
+                    clearcoat: 1
                 })
 
                 const loading2 = this.loadingBar.startLoading()
@@ -557,6 +558,7 @@ namespace hahaApp {
                     loading3.end()
                     ballMat.normalMap = tex
                     ballMat.normalMapType = THREE.TangentSpaceNormalMap
+                    ballMat.clearcoatNormalMap = tex
                     ballMat.needsUpdate = true
                 })
                 loader.load("./textures/fabric_leather_01_1k_jpg/fabric_leather_01_rough_1k.jpg", tex=>{
