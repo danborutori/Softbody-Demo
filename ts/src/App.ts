@@ -11,6 +11,9 @@ namespace hahaApp {
     const btV = new Ammo.btVector3
     const btT = new Ammo.btTransform
 
+    export const layerDefault = 0
+    export const layerOutline = 1
+
     class RotateObject extends Object {
 
         update(deltaTime: number){
@@ -112,6 +115,8 @@ namespace hahaApp {
 
             this.scene = new THREE.Scene()
             this.camera = new THREE.PerspectiveCamera(50,rect.width/rect.height)
+            this.camera.layers.set(layerDefault)
+            this.camera.layers.enable(layerOutline)
             this.envCamera = new THREE.CubeCamera(0.1,10, new THREE.WebGLCubeRenderTarget(256,{
                 format: THREE.RGBAFormat,
                 type: THREE.UnsignedByteType,
@@ -120,7 +125,8 @@ namespace hahaApp {
                 minFilter: THREE.LinearMipMapLinearFilter,
                 magFilter: THREE.LinearFilter,
                 anisotropy: 16
-            }))
+            })) 
+            this.envCamera.layers.set(layerDefault)
             this.envCamera.position.set(0,5,0)
             this.scene.environment = this.envCamera.renderTarget.texture
             this.scene.add(this.envCamera)
