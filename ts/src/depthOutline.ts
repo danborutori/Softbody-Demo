@@ -200,43 +200,42 @@ namespace hahaApp {
             ;(this.material as THREE.ShaderMaterial).uniforms.tColor.value = this.colorRenderTarget.texture
             ;(this.material as THREE.ShaderMaterial).uniforms.tDepth.value = this.depthRenderTarget.texture
             ;(this.material as THREE.ShaderMaterial).uniforms.tNormal.value = this.normalRenderTarget.texture
+            this.layers.set(layerOutline)
 
             this.onBeforeRender = (renderer, scene, camera)=>{
                 const restore = {
                     renderTarget: renderer.getRenderTarget() as THREE.WebGLRenderTarget,
                 }
 
-                if( !(restore.renderTarget as any).isWebGLCubeRenderTarget ){
-                    renderer.getDrawingBufferSize(v2)
-                    if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y ){
-                        this.depthRenderTarget.setSize(v2.x, v2.y)
-                        this.normalRenderTarget.setSize(v2.x, v2.y)
-                    }
-    
-    
-                    this.fsQuad.material = this.copyMaterial
-
-                    this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
-                    renderer.setRenderTarget( this.depthRenderTarget )
-                    this.fsQuad.render( renderer )
-
-                    this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.texture
-                    renderer.setRenderTarget( this.colorRenderTarget )
-                    this.fsQuad.render( renderer )
-
-                    this.depthToNormalMaterial.uniforms.tDepth.value = restore.renderTarget.depthTexture
-                    this.depthToNormalMaterial.uniforms.resolution.value.copy(v2)
-                    this.depthToNormalMaterial.uniforms.projectMatrixInv.value.copy((camera as THREE.PerspectiveCamera).projectionMatrixInverse)
-                    this.fsQuad.material = this.depthToNormalMaterial
-                    renderer.setRenderTarget( this.normalRenderTarget )
-                    this.fsQuad.render( renderer )
-
-                    ;(this.material as THREE.ShaderMaterial).uniforms.clipNear.value = (camera as THREE.PerspectiveCamera).near
-                    ;(this.material as THREE.ShaderMaterial).uniforms.clipFar.value = (camera as THREE.PerspectiveCamera).far
-                    ;(this.material as THREE.ShaderMaterial).uniforms.aspectRatio.value = (camera as THREE.PerspectiveCamera).aspect
-
-                    renderer.setRenderTarget(restore.renderTarget)
+                renderer.getDrawingBufferSize(v2)
+                if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y ){
+                    this.depthRenderTarget.setSize(v2.x, v2.y)
+                    this.normalRenderTarget.setSize(v2.x, v2.y)
                 }
+
+
+                this.fsQuad.material = this.copyMaterial
+
+                this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
+                renderer.setRenderTarget( this.depthRenderTarget )
+                this.fsQuad.render( renderer )
+
+                this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.texture
+                renderer.setRenderTarget( this.colorRenderTarget )
+                this.fsQuad.render( renderer )
+
+                this.depthToNormalMaterial.uniforms.tDepth.value = restore.renderTarget.depthTexture
+                this.depthToNormalMaterial.uniforms.resolution.value.copy(v2)
+                this.depthToNormalMaterial.uniforms.projectMatrixInv.value.copy((camera as THREE.PerspectiveCamera).projectionMatrixInverse)
+                this.fsQuad.material = this.depthToNormalMaterial
+                renderer.setRenderTarget( this.normalRenderTarget )
+                this.fsQuad.render( renderer )
+
+                ;(this.material as THREE.ShaderMaterial).uniforms.clipNear.value = (camera as THREE.PerspectiveCamera).near
+                ;(this.material as THREE.ShaderMaterial).uniforms.clipFar.value = (camera as THREE.PerspectiveCamera).far
+                ;(this.material as THREE.ShaderMaterial).uniforms.aspectRatio.value = (camera as THREE.PerspectiveCamera).aspect
+
+                renderer.setRenderTarget(restore.renderTarget)
             }
         }
 
