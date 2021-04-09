@@ -208,9 +208,10 @@ namespace hahaApp {
         start(){
 
             let requestingAnimationFrame = false
+            let clock = new THREE.Clock()
             setInterval(()=>{
                 if( this.running ){
-                    this.updateLoop( 1/60 )
+                    this.updateLoop( clock.getDelta() )
                     if( !requestingAnimationFrame ){
                         requestingAnimationFrame = true
                         requestAnimationFrame(()=>{
@@ -220,7 +221,7 @@ namespace hahaApp {
                         })
                     }
                 }
-            }, 1000/60)
+            }, 1000/200)
 
             setInterval(()=>{
                 this.hud.fps = this.fpsCounter
@@ -677,7 +678,7 @@ namespace hahaApp {
 
             this.player.update(this, deltaTime)
 
-            this.world.stepSimulation(deltaTime)
+            this.world.stepSimulation(deltaTime, Math.floor(deltaTime*60))
             this.traceContact()
 
             for( let obj of this.objects ){
