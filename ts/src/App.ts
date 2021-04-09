@@ -213,7 +213,8 @@ namespace hahaApp {
             let requestingAnimationFrame = false
             setInterval(()=>{
                 if( this.running ){
-                    this.updateLoop( this.clock.getDelta() )
+                    const dt = Math.min( this.clock.getDelta(), 1/30 )
+                    this.updateLoop( dt )
                     if( !requestingAnimationFrame ){
                         requestingAnimationFrame = true
                         requestAnimationFrame(()=>{
