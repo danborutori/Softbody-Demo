@@ -29,8 +29,15 @@ namespace hahaApp {
             depthBuffer: false,
             stencilBuffer: false
         })
+        private colorRenderTarget = new THREE.WebGLRenderTarget(1024,1024,{
+            format: THREE.RGBAFormat,
+            type: THREE.UnsignedByteType,
+            generateMipmaps: false,
+            depthBuffer: false,
+            stencilBuffer: false
+        })
 
-        private copyDepthMaterial = new THREE.ShaderMaterial({
+        private copyMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 tDiffuse: {
                     value: null
@@ -103,9 +110,13 @@ namespace hahaApp {
                 new THREE.PlaneBufferGeometry(2,2),
                 new THREE.ShaderMaterial({
                     defines:{
-                        SAMPLE_OFFSET_LEN: sampleOffsets.length
+                        SAMPLE_OFFSET_LEN: sampleOffsets.length,
+                        PI: Math.PI
                     },
                     uniforms: {
+                        tColor: {
+                            value: null
+                        },
                         tDepth: {
                             value: null
                         },
@@ -136,6 +147,7 @@ namespace hahaApp {
                     fragmentShader: `
                         #include <packing>
 
+                        uniform sampler2D tColor;
                         uniform sampler2D tDepth;
                         uniform sampler2D tNormal;
                         uniform float clipNear;
@@ -150,7 +162,9 @@ namespace hahaApp {
                             vec3 normal = texture2D(tNormal, vUv).xyz*2.0-1.0;
                             float viewZ = perspectiveDepthToViewZ(depth, clipNear, clipFar);
                             float depthDiff = 0.0;
-                            vec3 normalDiff = vec3(0,0,0);
+                            float maxNormalAngle = 0.0;
+                            vec2 colorUv = vUv;
+                            float closestZ = 1.0;
 
                             for( int i=0; i<SAMPLE_OFFSET_LEN; i++){
                                 vec2 uv = vUv+sampleOffsets[i]*vec2(aspectRatio, 1.0);
@@ -158,14 +172,19 @@ namespace hahaApp {
                                 vec3 n = texture2D(tNormal, uv).xyz*2.0-1.0;
                                 float vz = perspectiveDepthToViewZ(d, clipNear, clipFar);
                                 depthDiff += abs( viewZ-vz );
-                                normalDiff += abs( normal-n );
+                                maxNormalAngle = max( maxNormalAngle, acos(dot(normal,n)) );
+
+                                if( d<closestZ ){
+                                    closestZ = d;
+                                    colorUv = uv;
+                                }
                             }
                             depthDiff /= float(SAMPLE_OFFSET_LEN);
-                            normalDiff /= float(SAMPLE_OFFSET_LEN);
 
-                            float opacity = clamp((depthDiff-0.1)/0.01, 0.0, 1.0);
-                            opacity += clamp((length(normalDiff)-0.5)/0.25, 0.0, 1.0);
-                            vec3 lineColor = vec3(0,0,0);
+                            float opacity = clamp((depthDiff-0.1)/0.01,0.0,1.0); // depth edge
+                            opacity += clamp((maxNormalAngle-60.0*PI/180.0)/0.01,0.0,1.0); // normal edge
+                            vec3 lineColor = texture2D( tColor, colorUv ).rgb;
+                            lineColor = (lineColor-0.5)*1.5+0.5;
                             gl_FragColor = vec4(lineColor, opacity);
                         }
                     `,
@@ -178,12 +197,14 @@ namespace hahaApp {
 
             this.renderOrder = 1
             this.frustumCulled = false
+            ;(this.material as THREE.ShaderMaterial).uniforms.tColor.value = this.colorRenderTarget.texture
             ;(this.material as THREE.ShaderMaterial).uniforms.tDepth.value = this.depthRenderTarget.texture
             ;(this.material as THREE.ShaderMaterial).uniforms.tNormal.value = this.normalRenderTarget.texture
 
             this.onBeforeRender = (renderer, scene, camera)=>{
                 renderer.getDrawingBufferSize(v2)
                 if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y ){
+                    this.colorRenderTarget.setSize(v2.x, v2.y)
                     this.depthRenderTarget.setSize(v2.x, v2.y)
                     this.normalRenderTarget.setSize(v2.x, v2.y)
                 }
@@ -192,9 +213,14 @@ namespace hahaApp {
                     renderTarget: renderer.getRenderTarget()  as THREE.WebGLRenderTarget
                 }
 
-                this.copyDepthMaterial.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
-                this.fsQuad.material = this.copyDepthMaterial
+                this.fsQuad.material = this.copyMaterial
+
+                this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.depthTexture
                 renderer.setRenderTarget( this.depthRenderTarget )
+                this.fsQuad.render( renderer )
+
+                this.copyMaterial.uniforms.tDiffuse.value = restore.renderTarget.texture
+                renderer.setRenderTarget( this.colorRenderTarget )
                 this.fsQuad.render( renderer )
 
                 this.depthToNormalMaterial.uniforms.tDepth.value = restore.renderTarget.depthTexture
