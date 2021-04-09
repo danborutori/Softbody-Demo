@@ -116,8 +116,8 @@ namespace hahaApp {
                 format: THREE.RGBAFormat,
                 type: THREE.UnsignedByteType,
                 depthBuffer: true,
-                generateMipmaps: false,
-                minFilter: THREE.LinearFilter,
+                generateMipmaps: true,
+                minFilter: THREE.LinearMipMapLinearFilter,
                 magFilter: THREE.LinearFilter,
                 anisotropy: 16
             }))
