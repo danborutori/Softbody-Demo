@@ -87,6 +87,7 @@ namespace hahaApp {
         readonly pointerMove = new THREE.Vector2
         readonly pointerPosition = new THREE.Vector2
 
+        private clock = new THREE.Clock()
         private fpsCounter = 0
         private running = true
 
@@ -179,9 +180,11 @@ namespace hahaApp {
                 switch (document.visibilityState) {
                     case "visible":
                         this.running = true
+                        this.clock.start()
                         break
                     case "hidden":
                         this.running = false
+                        this.clock.stop()
                         break
                 }
             })
@@ -208,10 +211,9 @@ namespace hahaApp {
         start(){
 
             let requestingAnimationFrame = false
-            let clock = new THREE.Clock()
             setInterval(()=>{
                 if( this.running ){
-                    this.updateLoop( clock.getDelta() )
+                    this.updateLoop( this.clock.getDelta() )
                     if( !requestingAnimationFrame ){
                         requestingAnimationFrame = true
                         requestAnimationFrame(()=>{
