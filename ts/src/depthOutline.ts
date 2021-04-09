@@ -29,7 +29,7 @@ namespace hahaApp {
             depthBuffer: false,
             stencilBuffer: false
         })
-        private colorRenderTarget = new THREE.WebGLRenderTarget(1024,1024,{
+        private colorRenderTarget = new THREE.WebGLRenderTarget(512,512,{
             format: THREE.RGBAFormat,
             type: THREE.UnsignedByteType,
             generateMipmaps: false,
@@ -204,7 +204,6 @@ namespace hahaApp {
             this.onBeforeRender = (renderer, scene, camera)=>{
                 renderer.getDrawingBufferSize(v2)
                 if( this.depthRenderTarget.width!=v2.x || this.depthRenderTarget.height!=v2.y ){
-                    this.colorRenderTarget.setSize(v2.x/16, v2.y/16)
                     this.depthRenderTarget.setSize(v2.x, v2.y)
                     this.normalRenderTarget.setSize(v2.x, v2.y)
                 }
